@@ -18,8 +18,31 @@
         <meta charset="utf-8"/>
         <meta name="ac-discovery" content="{{.ServerName}} {{.ListenMode}}://{{.ServerName}}/ac-image/{{.Name}}-{version}-{os}-{arch}.{ext}"/>
         <meta name="ac-discovery-pubkeys" content="{{.ServerName}} {{.ListenMode}}://{{.ServerName}}/ac-pubkeys/pubkeys.gpg">
+        <meta name="ac-push-discovery" content="{{.ServerName}} {{.ListenMode}}://{{.ServerName}}/ac-push/etcd/startupload"/>
     </head>
     <body>
-        <h1>ACI images discovery</h1>
+        <h1>{{.ServerName}}</h1>
+        <h2>ACI images fetchable from here:</h2>
+        {{range $i, $e := .ACIs}}
+            <h3>{{$.ServerName}}/{{$e.Name}}</h3>
+            <table>
+                    <tr>
+                        <th>Version</th>
+                        <th>Operating System</th>
+                        <th>Architecture</th>
+                        <th>Signed</th>
+                        <th>Last Modified</th>
+                    </tr>
+                {{range $j, $d := $e.Details}}
+                    <tr>
+                        <td>{{$d.Version}}</td>
+                        <td>{{$d.OS}}</td>
+                        <td>{{$d.Arch}}</td>
+                        <td>{{$d.Signed}}</td>
+                        <td>{{$d.LastMod}}</td>
+                    </tr>
+                {{end}}
+            </table>
+        {{end}}
     </body>
 </html>

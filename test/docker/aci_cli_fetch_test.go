@@ -24,7 +24,7 @@ func TestAciFetch(t *testing.T) {
       	{test.Domains, "etcd", "v2.2.2", "linux", "amd64", ".aci"},
     }
 
-    for _, tt := range nametests {
+    for _, tt := range tests {
     	aciname := tt.domains + "/" + tt.name + ":" + tt.version
 
     	cmd = exec.Command(test.RktBinary, "fetch", aciname)
