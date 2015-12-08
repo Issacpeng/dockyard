@@ -25,7 +25,7 @@ func DiscoveryACIHandler(ctx *macaron.Context, log *logs.BeeLogger) {
 	}
 
     fmt.Println("############## ParseFiles ##############\r\n")
-	t, err := template.ParseFiles("conf/acifetchtemplate.html")
+	t, err := template.ParseFiles("conf/acitemplate.html")
 	if err != nil {
 		log.Error("[ACI API] Discovery parse template file failed: %v", err.Error())
 		ctx.Resp.WriteHeader(http.StatusInternalServerError)

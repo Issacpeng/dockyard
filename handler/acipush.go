@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -59,7 +58,6 @@ type upload struct {
 
 var (
 	directory     string
-	dirpush       string
 	templatedir   string
 	uploadcounter int
 	newuploadLock sync.Mutex
@@ -69,45 +67,7 @@ var (
 func init() {
 	uploads = make(map[int]*upload)
 
-	directory = "/home/gopath/src/github.com/containerops/dockyard/data/acpool/"
-	dirpush = "/home/gopath/acistorge"
 	templatedir = "conf"
-
-}
-
-func RenderListOfACIs(ctx *macaron.Context, log *logs.BeeLogger) {
-    fmt.Println("############## renderListOfACIs ##############\r\n")
-	os.RemoveAll(path.Join(directory, "tmp"))
-	err := os.MkdirAll(path.Join(directory, "tmp"), 0755)
-	if err != nil {
-        fmt.Println("############## MkdirAll fail ##############\r\n")
-		fmt.Fprintf(os.Stderr, "%v", err)
-	}
-    fmt.Println("############## ParseFiles ##############\r\n")
-	t, err := template.ParseFiles(path.Join(templatedir, "acifetchtemplate.html"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v", err)
-	}
-	acis, err := listACIs()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v", err)
-	}
-
-	err = t.Execute(ctx.Resp, struct {
-		Name       string
-		ServerName string
-		ListenMode string
-		ACIs       []aci
-	}{
-		Name:       "etcd",
-		ServerName: setting.Domains,
-		ListenMode: setting.ListenMode,
-		ACIs:       acis,
-	})
-	if err != nil {
-		log.Error("[ACI API] Discovery ACIlist failed: %v", err.Error())
-		fmt.Fprintf(ctx.Resp, fmt.Sprintf("%v", err))
-	}
 }
 
 func GetPubkeys(ctx *macaron.Context, log *logs.BeeLogger) (int, []byte) {
@@ -127,7 +87,7 @@ func GetPubkeys(ctx *macaron.Context, log *logs.BeeLogger) (int, []byte) {
 func InitiateUpload(ctx *macaron.Context, log *logs.BeeLogger) (int, []byte) {
     fmt.Println("############## InitiateUpload ##############\r\n")
 	image := ctx.Params(":image")
-	image = "etcd-v2.2.2-linux-amd64.aci"
+//	image = "etcd-v2.2.2-linux-amd64.aci"
 	if image == "" {
 		log.Error("[ACI API]Get image name failed")
 		result, _ := json.Marshal(map[string]string{"message": "Get image name failed"})
@@ -506,9 +466,10 @@ func gotMan(num int) error {
 }
 
 func listACIs() ([]aci, error) {
+	directory = setting.Acipushdir
     fmt.Println("############## listACIs ##############\r\n")
     fmt.Printf("############## listACIs-directory: %v ##############\r\n", directory)
-	files, err := ioutil.ReadDir(dirpush)
+	files, err := ioutil.ReadDir(directory)
 	if err != nil {
 		return nil, err
 	}

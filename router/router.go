@@ -55,9 +55,8 @@ func SetRouters(m *macaron.Macaron) {
 
 	//acis push
 	m.Group("/ac-push", func() {
-//		m.Post("/listacis", handler.RenderListOfACIs)
 		m.Get("/pubkeys.gpg", handler.GetPubkeys)
-		m.Post("/:image/startupload", handler.InitiateUpload)
+		m.Post("/:server/:image/startupload", handler.InitiateUpload)
 		m.Put("/manifest/:num", handler.UploadManifest)
 		m.Put("/signature/:num", handler.ReceiveSignUpload)
 		m.Put("/aci/:num", handler.ReceiveAciUpload)
