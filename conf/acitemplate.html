@@ -16,9 +16,9 @@
 <html lang="en">
     <head>
         <meta charset="utf-8"/>
-        <meta name="ac-discovery" content="{{.ServerName}} {{.ListenMode}}://{{.ServerName}}/ac-image/{{.Name}}-{version}-{os}-{arch}.{ext}"/>
-        <meta name="ac-discovery-pubkeys" content="{{.ServerName}} {{.ListenMode}}://{{.ServerName}}/ac-pubkeys/pubkeys.gpg">
-        <meta name="ac-push-discovery" content="{{.ServerName}} {{.ListenMode}}://{{.ServerName}}/ac-push/{name}-{version}-{os}-{arch}.{ext}/startupload"/>
+        <meta name="ac-discovery" content="{{.ServerName}} {{.ListenMode}}://{{.ServerName}}/ac-fetch/{{.Name}}-{version}-{os}-{arch}.{ext}"/>
+        <meta name="ac-discovery-pubkeys" content="{{.ServerName}} {{.ListenMode}}://{{.ServerName}}/ac-pubkeys/{{.ServerName}}/pubkeys.gpg"/>
+        <meta name="ac-push-discovery" content="{{.ServerName}} {{.ListenMode}}://{{.ServerName}}/ac-push/{name}-{version}-{os}-{arch}.{ext}"/>
     </head>
     <body>
         <h1>{{.ServerName}}</h1>

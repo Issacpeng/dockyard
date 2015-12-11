@@ -31,6 +31,7 @@ type Image struct {
 }
 
 func (i *Image) Has(image string) (bool, string, error) {
+	fmt.Printf("######### Image Has : %v #########\r\n", image)
 	if key := db.Key("image", image); len(key) <= 0 {
 		return false, "", fmt.Errorf("Invalid image key")
 	} else {
@@ -48,7 +49,7 @@ func (i *Image) Has(image string) (bool, string, error) {
 
 func (i *Image) Save() error {
 	key := db.Key("image", i.ImageId)
-
+	fmt.Printf("######### Image Save key: %v #########\\r\n", key)
 	if err := db.Save(i, key); err != nil {
 		return err
 	}

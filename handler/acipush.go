@@ -466,7 +466,7 @@ func gotMan(num int) error {
 }
 
 func listACIs() ([]aci, error) {
-	directory = setting.Acipushdir
+	directory = setting.ImagePath
     fmt.Println("############## listACIs ##############\r\n")
     fmt.Printf("############## listACIs-directory: %v ##############\r\n", directory)
 	files, err := ioutil.ReadDir(directory)
