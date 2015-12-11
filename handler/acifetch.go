@@ -4,11 +4,15 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"fmt"
+	"strings"
 
 	"github.com/astaxie/beego/logs"
 	"gopkg.in/macaron.v1"
 
-	"github.com/containerops/wrench/setting"
+//	"github.com/containerops/wrench/setting"
+	"github.com/containerops/dockyard/models"
+	"github.com/containerops/wrench/utils"
 )
 
 /* TBD:
@@ -20,9 +24,10 @@ func GetPubkeysHandler(ctx *macaron.Context, log *logs.BeeLogger) (int, []byte) 
 	var pubkey []byte
 	var err error
 
-	pubkeypath := setting.ImagePath + "/acpool/" + "pubkeys.gpg"
-	if pubkey, err = ioutil.ReadFile(pubkeypath); err != nil {
-		// TBD: consider to fetch pubkey from other storage medium
+	servername := ctx.Params(":servername")
+
+    p := new(models.Pubkey)
+    if pubkey, err = p.GetPubkey(servername); err != nil {
 
 		log.Error("[ACI API] Get pubkey file failed: %v", err.Error())
 		result, _ := json.Marshal(map[string]string{"message": "Get pubkey file failed"})
@@ -34,12 +39,29 @@ func GetPubkeysHandler(ctx *macaron.Context, log *logs.BeeLogger) (int, []byte) 
 
 func GetACIHandler(ctx *macaron.Context, log *logs.BeeLogger) (int, []byte) {
 	var img []byte
+	var imgpath string
 	var err error
 
-	name := ctx.Params(":acname")
+	acname := ctx.Params(":acname")
+    aciId := utils.MD5(fmt.Sprintf("%s", acname))
+    a := new(models.Aci)
 
-	//support to fetch images from location storage, it will be supported to fetch from cloud etc.
-	imgpath := setting.ImagePath + "/acpool/" + name
+    if asc := strings.Contains(acname, ".aci.asc"); asc == true {
+        if imgpath, err = a.GetSignPath(aciId); err != nil {
+
+		    log.Error("[ACI API] Get ACI SignPath failed: %v", err.Error())
+		    result, _ := json.Marshal(map[string]string{"message": "Get ACI SignPath failed"})
+		    return http.StatusNotFound, result
+		}
+    } else {
+        if imgpath, err = a.GetAciPath(aciId); err != nil {
+
+			log.Error("[ACI API] Get ACI AciPath failed: %v", err.Error())
+			result, _ := json.Marshal(map[string]string{"message": "Get ACI AciPath failed"})
+			return http.StatusNotFound, result
+		}
+    }
+
 	if img, err = ioutil.ReadFile(imgpath); err != nil {
 		// TBD: consider to fetch image from other storage medium
 
