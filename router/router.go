@@ -48,25 +48,6 @@ func SetRouters(m *macaron.Macaron) {
 	})
 
 	//Rkt Registry & Hub API
-<<<<<<< HEAD
-	//acis discovery
-	m.Get("/etcd?ac-discovery=1", handler.DiscoveryACIHandler)
-	m.Get("/?ac-discovery=1", handler.DiscoveryACIHandler)
-
-	//acis fetch
-	m.Group("/ac-pull", func() {
-		fmt.Println("SetRouters ac-pull")
-		m.Get("/dist/pubkeys/:name", handler.GetRktPukkeysHandler)
-		m.Get("/:version/:name", handler.GetRktfileHandler)
-	})
-
-	//acis push
-	m.Group("/ac-push", func() {
-		fmt.Println("SetRouters ac-push-discovery")
-		m.Get("/", handler.RenderListOfACIs)
-		m.Get("/pubkeys.gpg", handler.GetPubkeys)
-		m.Post("/:image/startupload", handler.InitiateUpload)
-=======
 	//acis discovery responds endpoints
 	m.Get("/:imagename/?ac-discovery=1", handler.DiscoveryACIHandler)
 
@@ -78,7 +59,6 @@ func SetRouters(m *macaron.Macaron) {
 	m.Group("/ac-push", func() {
 		m.Get("/:servername/pubkeys.gpg", handler.GetPubkeys)
 		m.Post("/:servername/:image", handler.InitiateUpload)
->>>>>>> acpush-opt
 		m.Put("/manifest/:num", handler.UploadManifest)
 		m.Put("/signature/:num", handler.ReceiveSignUpload)
 		m.Put("/aci/:num", handler.ReceiveAciUpload)
