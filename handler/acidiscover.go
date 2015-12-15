@@ -1,67 +1,56 @@
-package handler
-
-import (
-	//"encoding/json"
+import package handler
+(
 	"fmt"
+	"html/template"
 	"net/http"
+	"os"
+	"path"
 
+	"github.com/astaxie/beego/logs"
 	"gopkg.in/macaron.v1"
+
+	"github.com/containerops/wrench/setting"
 )
 
-func DiscoveryACIHandler(ctx *macaron.Context) (int, []byte) {
-	repo := ctx.Params(":repository")
-	fmt.Printf("\r\nGetRktDiscoveryHandler ctx.Req.URL: %v, repo:%v\r\n", ctx.Req.URL, repo)
+// TBD: discovery template should be updated to keep in line with ACI
+func DiscoveryACIHandler(ctx *macaron.Context, log *logs.BeeLogger) {
+	img := ctx.Params(":imagename")
+    fmt.Println("############## renderListOfACIs ##############\r\n")
+	os.RemoveAll(path.Join(directory, "tmp"))
+	err := os.MkdirAll(path.Join(directory, "tmp"), 0755)
+	if err != nil {
+        fmt.Println("############## MkdirAll fail ##############\r\n")
+		fmt.Fprintf(os.Stderr, "%v", err)
+	}
 
-	// TBD: generate aci template and endpoint like ac-push
-	/*
-		t, err := template.ParseFiles(path.Join(templatedir, "acitemplate.html"))
-		if err != nil {
-			fmt.Fprintf(ctx.Resp, fmt.Sprintf("%v", err))
-			result, _ := json.Marshal(err)
-			return http.StatusInternalServerError, result
-		}
-		fmt.Printf("renderListOfACIs t: %v:\r\n", t)
-		acis, err := listACIs()
-		if err != nil {
-			result, _ := json.Marshal(err)
-			return http.StatusInternalServerError, result
-		}
-		fmt.Printf("renderListOfACIs acis: %v:\r\n", acis)
-		err = t.Execute(ctx.Resp, struct {
-			ServerName string
-			ACIs       []aci
-			HTTPS      bool
-		}{
-			ServerName: serverName,
-			ACIs:       acis,
-			HTTPS:      *https,
-		})
-		if err != nil {
-			result, _ := json.Marshal(err)
-			return http.StatusInternalServerError, result
-		}
+    fmt.Println("############## ParseFiles ##############\r\n")
+	t, err := template.ParseFiles("conf/acitemplate.html")
+	if err != nil {
+		log.Error("[ACI API] Discovery parse template file failed: %v", err.Error())
+		ctx.Resp.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(ctx.Resp, fmt.Sprintf("%v", err))
+		return
+	}
 
-		result, _ := json.Marshal(map[string]string{})
-		return http.StatusOK, result
-	*/
+	acis, err := listACIs()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v", err)
+	}
 
-	//return the body of resp data from coreos.com, including template prepared for http requests
-	//    result := "<html lang=\"en\">\r\n"
-
-	//    result += "<head>\r\n"
-	//    result += "<meta charset=\"utf-8\">\r\n"
-	result := "<meta name=\"ac-discovery\" content="
-	result += "\"containerops.me/etcd https://containerops.me/ac-pull/{version}/etcd-{version}-{os}-{arch}.{ext}\">\r\n"
-	result += "<meta name=\"ac-discovery-pubkeys\" content="
-	result += "\"containerops.me/etcd https://coreos.com/dist/pubkeys/aci-pubkeys.gpg\">\r\n"
-	result += "</head>\r\n"
-
-	//    result += "<body class=\"coreos-home co-m-main-nav-transparent co-p-header-large\">\r\n"
-	//    result += "  </body>\r\n"
-
-	//    result += "</html>\r\n"
-
-	fmt.Printf("result %v\r\n", result)
-	return http.StatusOK, []byte(result)
-
+	err = t.Execute(ctx.Resp, struct {
+		Name       string
+		ServerName string
+		ListenMode string
+		ACIs       []aci
+	}{
+		Name:       img,
+		ServerName: setting.Domains,
+		ListenMode: setting.ListenMode,
+		ACIs:       acis,
+	})
+	if err != nil {
+		log.Error("[ACI API] Discovery ACIlist failed: %v", err.Error())
+		fmt.Fprintf(ctx.Resp, fmt.Sprintf("%v", err))
+	}
 }
+

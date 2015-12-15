@@ -2,19 +2,46 @@
 ![Dockyard](docs/dockyard.jpg "Dockyard")
 
 ## What is Dockyard
-Dockyard is an image hub for docker, rkt or other container engines.
+Dockyard is an image hub for docker, rkt or other container engines. Its features include:
+- Image storage and meta discovery for popular container runtime such as docker and rkt.
+- Image distribution by P2P protocol.
+- Public and private repositories for users and organizations.
+- Built-in object storage engine and drivers.
+- Built-in object storage service.
+- Built-in container volume management for runtime with distributed file system.
+- Convert image object to distributed file-system for container mount and start directly.
+- Container image encryption and verification.
 
 ## How it works
+The architecture of Dockyard illustrated as below:
+
+![arch](docs/arch.png "architecture")
+
 Please refer to [design](docs/design.md) for more information.
 
 ## Why it matters
-With dockyard you can manage your container images as freely as you can, you need not to concern with different container engines, and you will not be locked in by docker hub.
+Confused by docker registry v1 and v2? Helpless to face different container images(e.g. Docker or rkt)? Too lazy to deal with container image storage problems? Do not worry, Dockyard is coming for you. Please have a cup of tea and wait for this whole thing to blow over.
+
+With dockyard you can manage your container images as freely as you can, you need not to concern with different container engines, and you will not be locked in by docker hub. Just throw these tricky work to Dockyard and focus on your main business.
 
 ## Current Status
 Please watch this space for updates on the progress.
 Dockyard project is under heavy development and is ready for simple use.
+- Docker registry V1
+- Docker registry V2
+- Object storage backend and drivers
+- REST API interface
+- Rkt Meta Discovery
+- P2P modules
+- Object storage service
 
 ## Future
+Work in the future illustrated as below:
+- Volume management with distributed file-system.
+- Convert between object storage and distributed file-system.
+- Web interface and CLI interface.
+- Container image encryption and verification.
+
 Please refer to [roadmap](ROADMAP.md) for more information.
 
 ## Try it out
@@ -39,7 +66,7 @@ sudo make install
 ```
 
 ### Prerequisites
-It is quite easy to use dockyard, only a little work should be done before starting dockyard service. Take it easy, just follow the instructions as below.
+It is quite easy to use Dockyard, only a little work should be done before starting dockyard service. Take it easy, just follow the instructions as below.
 
 #### Dockyard runtime configuration
 Please add a runtime config file named `runtime.conf` under `dockyard/conf` before starting `dockyard` service. Below is a `runtime.conf` example:
@@ -199,6 +226,7 @@ If any issues are encountered while using the dockyard project, several avenues 
 
 ## Who should join
 - Ones who want to choose a container image hub instead of docker hub.
+- Ones who want to ease the burden of container image management.
 
 ## Certificate of Origin
 By contributing to this project you agree to the Developer Certificate of
