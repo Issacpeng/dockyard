@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"encoding/json"
 
 	"github.com/containerops/wrench/db"
 )
@@ -35,105 +34,6 @@ type CompleteMsg struct {
 	Reason       string `json:"reason,omitempty"`
 	ServerReason string `json:"server_reason,omitempty"`
 }
-
-
-
-type ImageManifest struct {
-	ACKind        string             `json:"acKind"`
-	ACVersion     string             `json:"acVersion"`
-	Name          string             `json:"name"`
-	Labels        []Label            `json:"labels,omitempty"`
-	App           *App               `json:"app,omitempty"`
-	Annotations   []Annotation       `json:"annotations,omitempty"`
-	Dependencies  []Dependency       `json:"dependencies,omitempty"`
-	PathWhitelist []string           `json:"pathWhitelist,omitempty"`
-}
-
-type Version struct {
-	Major      int64
-	Minor      int64
-	Patch      int64
-	PreRelease string
-	Metadata   string
-}
-
-type Label struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-}
-
-type App struct {
-	Exec              []string       `json:"exec"`
-	EventHandlers     []EventHandler `json:"eventHandlers,omitempty"`
-	User              string         `json:"user"`
-	Group             string         `json:"group"`
-	SupplementaryGIDs []int          `json:"supplementaryGIDs,omitempty"`
-	WorkingDirectory  string         `json:"workingDirectory,omitempty"`
-	Environment       []EnvironmentVariable  `json:"environment,omitempty"`
-	MountPoints       []MountPoint   `json:"mountPoints,omitempty"`
-	Ports             []Port         `json:"ports,omitempty"`
-	Isolators         []Isolator     `json:"isolators,omitempty"`
-}
-
-type EventHandler struct {
-	Name string     `json:"name"`
-	Exec []string   `json:"exec"`
-}
-
-type EnvironmentVariable struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-}
-
-type MountPoint struct {
-	Name     string `json:"name"`
-	Path     string `json:"path"`
-	ReadOnly bool   `json:"readOnly,omitempty"`
-}
-
-type Port struct {
-	Name            string `json:"name"`
-	Protocol        string `json:"protocol"`
-	Port            uint   `json:"port"`
-	Count           uint   `json:"count"`
-	SocketActivated bool   `json:"socketActivated"`
-}
-
-type Isolator struct {
-	// Name is the name of the Isolator type as defined in the specification.
-	Name string `json:"name"`
-	// ValueRaw captures the raw JSON value of an Isolator that was
-	// unmarshalled. This field is used for unmarshalling only. It MUST NOT
-	// be referenced by external users of the Isolator struct. It is
-	// exported only to satisfy Go's unfortunate requirement that fields
-	// must be capitalized to be unmarshalled successfully.
-	ValueRaw *json.RawMessage `json:"value"`
-	// value captures the "true" value of the isolator.
-	value IsolatorValue
-}
-
-type IsolatorValue interface {
-//	UnmarshalJSON(b []byte) error
-//	AssertValid() error
-}
-
-type Annotation struct {
-	Name  string   `json:"name"`
-	Value string   `json:"value"`
-}
-
-type Dependency struct {
-	ImageName string    `json:"imageName"`
-	ImageID   *Hash     `json:"imageID,omitempty"`
-	Labels    []Label   `json:"labels,omitempty"`
-	Size      uint      `json:"size,omitempty"`
-}
-
-type Hash struct {
-	typ string
-	Val string
-}
-
 
 type TemplateDesc struct {
 	NameSpace  string

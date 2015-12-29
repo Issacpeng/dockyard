@@ -79,17 +79,6 @@ func GetUploadEndPointHandler(ctx *macaron.Context, log *logs.BeeLogger) (int, [
 }
 
 func PutManifestHandler(ctx *macaron.Context, log *logs.BeeLogger) (int, []byte) {    
-    namespace := ctx.Params(":namespace")
-	aciPathTmp := fmt.Sprintf("%v/acipool/%v/tmp", setting.ImagePath, namespace)
-    maniFullnameTmp := fmt.Sprintf("%v/manifest", aciPathTmp)
-
-   	data, _ := ctx.Req.Body().Bytes()
-	if err := ioutil.WriteFile(maniFullnameTmp, data, 0777); err != nil {
-		log.Error("[ACI API] Save manifileTmp failed: %v", err.Error())
-
-		result, _ := json.Marshal(map[string]string{"message": "Save manifileTmp failed"})
-		return http.StatusBadRequest, result
-	}
 
 	result, _ := json.Marshal(map[string]string{})
 	return http.StatusOK, result
@@ -187,7 +176,6 @@ func ImageCheck(namespace string, imgname string, log *logs.BeeLogger) (int, []b
 	aciPathTmp := fmt.Sprintf("%v/acipool/%v/tmp", setting.ImagePath, namespace)
 	aciPath := fmt.Sprintf("%v/acipool/%v/%v", setting.ImagePath, namespace, imgname)
 
-    maniFullnameTmp := fmt.Sprintf("%v/manifest", aciPathTmp)
 	signFullnameTmp := fmt.Sprintf("%v/%v%v", aciPathTmp, imgname, ".aci.asc")
 	aciFullnameTmp  := fmt.Sprintf("%v/%v%v", aciPathTmp, imgname, ".aci")
 
@@ -198,7 +186,7 @@ func ImageCheck(namespace string, imgname string, log *logs.BeeLogger) (int, []b
 	keyspath := fmt.Sprintf("%v/acipool/%v/pubkeys", setting.ImagePath, namespace)
 
     //image verification
-    if err := ImageVerification(maniFullnameTmp, signFullnameTmp, aciFullnameTmp, acifromPushname, keyspath); err != nil {
+    if err := ImageVerification(signFullnameTmp, aciFullnameTmp, acifromPushname, keyspath); err != nil {
 		if err := os.RemoveAll(aciPathTmp); err != nil {
 			log.Error("[ACI API] Remove aciPathTmp failed: %v", err.Error())
 
@@ -240,12 +228,7 @@ func ImageCheck(namespace string, imgname string, log *logs.BeeLogger) (int, []b
 	return http.StatusOK, result, nil
 }  
 
-func ImageVerification(maniFullnameTmp string, signFullnameTmp string, aciFullnameTmp string, acifromPushname string, keyspath string) error {
-    manifileTmp, err := ioutil.ReadFile(maniFullnameTmp)
-	if err != nil {
-		return fmt.Errorf("opening manifileTmp file failed: %v", err.Error())
-	}
-
+func ImageVerification(signFullnameTmp string, aciFullnameTmp string, acifromPushname string, keyspath string) error {
     signfileTmp, err := os.Open(signFullnameTmp)
 	if err != nil {
 		return fmt.Errorf("opening signfileTmp file failed: %v", err.Error())
@@ -257,27 +240,6 @@ func ImageVerification(maniFullnameTmp string, signFullnameTmp string, aciFullna
 		return fmt.Errorf("opening acifileTmp file failed: %v", err.Error())
 	}
 	defer acifileTmp.Close()
-
-    //check validity of manifest
-	manifest := &models.ImageManifest{}
-	if err := json.Unmarshal(manifileTmp, manifest); err != nil {
-		return err
-	}
-
-	if manifest.ACKind != "ImageManifest" {
-		return fmt.Errorf("missing or bad ACKind, must be %v", "ImageManifest")
-	}
-	if manifest.ACVersion == "" {
-		return fmt.Errorf("acVersion must be set")
-	}
-	if string(manifest.Name) == "" {
-		return fmt.Errorf("name must be set")
-	}
-
-	if acifromPushname != "" && string(manifest.Name) != acifromPushname {
-		return fmt.Errorf("error when reading the app name: %q expected but %q found",
-				acifromPushname, string(manifest.Name))
-	}
 
     //load keyring
 	files, err := ioutil.ReadDir(keyspath)
